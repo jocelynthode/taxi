@@ -28,7 +28,7 @@ class Project:
     }
 
     def __init__(self, id, name, status=None, description=None, budget=None, team=None):
-        self.id = id.lower() if isinstance(id, str) else int(id)
+        self.id = str(id)
         self.name = name
         self.activities = []
         self.status = int(status) if status is not None else None
@@ -79,7 +79,7 @@ Description: %s""" % (self.id, self.name, status, start_date, end_date,
 
     def get_activity(self, id):
         for activity in self.activities:
-            if str(activity.id) == str(id):
+            if activity.id == id:
                 return activity
 
         return None
@@ -117,8 +117,8 @@ Description: %s""" % (self.id, self.name, status, start_date, end_date,
 
 
 class Activity:
-    def __init__(self, id, name, price=None):
-        self.id = id.lower() if isinstance(id, str) else int(id)
+    def __init__(self, id, name, price):
+        self.id = str(id)
         self.name = name
         self.price = price
 
@@ -178,7 +178,7 @@ class ProjectsDb:
             for s in search:
                 s = s.lower()
                 found = (project.name.lower().find(s) > -1 or
-                         str(project.id).lower().find(s) > -1)
+                         project.id == s)
 
                 if not found:
                     break
@@ -198,7 +198,7 @@ class ProjectsDb:
             self._projects_by_id_cache = defaultdict(list)
 
             for project in projects:
-                self._projects_by_id_cache[str(project.id).lower()].append(project)
+                self._projects_by_id_cache[project.id].append(project)
 
         for project in self._projects_by_id_cache.get(id, []):
             if backend is None or project.backend == backend:
@@ -259,7 +259,7 @@ class LocalProjectsDbDecoder(json.JSONDecoder):
         projects_copy = []
         for project in projects:
             project['activities'] = [
-                Activity(activity['id'], activity['name'], activity['price'])
+                Activity(str(activity['id']), activity['name'], activity['price'])
                 for activity in project['activities']
             ]
             for date_type in ['start_date', 'end_date']:
@@ -267,8 +267,10 @@ class LocalProjectsDbDecoder(json.JSONDecoder):
                     project[date_type] = datetime.datetime.strptime(
                         project[date_type], '%Y-%m-%d').date()
 
-            p_copy = Project(project['id'], project['name'])
+            p_copy = Project(str(project['id']), project['name'])
             p_copy.__dict__.update(project)
+            # Make sure project id is a string
+            p_copy.id = str(project['id'])
             projects_copy.append(p_copy)
 
         lpdb = LocalProjectsDb(projects_copy)

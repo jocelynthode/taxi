@@ -14,6 +14,7 @@ class Mapping(collections.namedtuple('BaseMapping', ['mapping', 'backend'])):
 class AliasesDatabase(object):
     """
     Dict-like object containing aliases and their corresponding mappings.
+    Aliases are case-insensitive.
 
     Example usage:
 
@@ -32,20 +33,20 @@ class AliasesDatabase(object):
         self.reset()
 
         if aliases:
-            self.aliases = aliases
+            self.aliases = {key.lower(): value for key, value in aliases.items()}
 
     def __getitem__(self, key):
         """
         Return the corresponding :py:class:`Mapping` object. It might raise
         KeyError if not found but that's the expected behaviour.
         """
-        return self.aliases[key]
+        return self.aliases[key.lower()]
 
     def __setitem__(self, key, value):
-        self.aliases[key] = value
+        self.aliases[key.lower()] = value
 
     def __contains__(self, key):
-        return key in self.aliases
+        return key.lower() in self.aliases
 
     def __iter__(self):
         """
@@ -66,6 +67,7 @@ class AliasesDatabase(object):
         return list(self.aliases.keys())
 
     def update(self, other):
+        other = {key.lower(): value for key, value in other.items()}
         self.aliases.update(other)
 
     def reset(self):
@@ -118,6 +120,9 @@ class AliasesDatabase(object):
         Return aliases that start with the given `alias`, optionally filtered
         by backend.
         """
+        if alias:
+            alias = alias.lower()
+
         def alias_filter(key_item):
             key, item = key_item
 
