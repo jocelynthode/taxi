@@ -39,7 +39,7 @@ let
 
     propagatedBuildInputs =
       [ python3.pkgs.click python3.pkgs.appdirs python3.pkgs.setuptools ];
-    checkInputs = [ python3.pkgs.pytest python3.pkgs.freezegun ];
+    nativeCheckInputs = [ python3.pkgs.pytest python3.pkgs.freezegun ];
     checkPhase = "pytest";
 
     passthru = { inherit withPlugins; };

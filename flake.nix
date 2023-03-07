@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     flake-compat = {
       url = "github:edolstra/flake-compat";
@@ -32,7 +32,6 @@
               });
           in {
             # TODO generate this dynamically
-            taxiPython37 = testWithPython pkgs.python37;
             taxiPython38 = testWithPython pkgs.python38;
             taxiPython39 = testWithPython pkgs.python39;
             taxiPython310 = testWithPython pkgs.python310;
